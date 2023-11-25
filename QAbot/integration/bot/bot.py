@@ -43,6 +43,8 @@ class Bot:
         type=resolve_file_type(context)
         if type == FileTypes.JSON:
             jq_schema = kwargs.get('jq_schema', '.[].answer')
+        else:
+            jq_schema = None
         self.knowledge_base.add_document(context, type=type, jq_schema=jq_schema)
 
         answer_dict = {}
