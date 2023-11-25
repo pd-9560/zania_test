@@ -5,6 +5,7 @@ from langchain.schema import StrOutputParser
 from langchain import hub
 
 from integration.rag_services.knowledge_service import KnowledgeBase
+from integration.rag_services.constants import FileTypes
 from integration.utils import resolve_file_type
 
 
@@ -32,14 +33,17 @@ class Bot:
         context = self._format_docs(self.knowledge_base.retrive(question=question, top_n=3))
         return self.chain.invoke({'context': context, 'question': question})
 
-    def answer(self, context, questions):
+    def answer(self, context, questions, *args, **kwargs):
         """
         Args:
             context: path to context file
             questions: a list of questions
         """
         #  add context to knowledge base
-        self.knowledge_base.add_document(context, type=resolve_file_type(context))
+        type=resolve_file_type(context)
+        if type == FileTypes.JSON:
+            jq_schema = kwargs.get('jq_schema', '.[].answer')
+        self.knowledge_base.add_document(context, type=type, jq_schema=jq_schema)
 
         answer_dict = {}
         for question in questions:

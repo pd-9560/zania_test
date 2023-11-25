@@ -27,11 +27,21 @@ class AnsweringBotAPIView(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             
             # save context
-            context_file_name = default_storage.save(context.name, context)
+            context_file_name = context.name
             context_file_path = str(settings.MEDIA_ROOT) + \
             "/" + str(context_file_name)
-            
+            with open(context_file_path, "w", encoding="utf8", errors='ignore') as f:
+                data = context.read()
+                print(data[0])
+                if data[0] == 255:
+                    data = data.decode('utf-16')
+                else:
+                    try:
+                        data = data.decode('utf-8')
+                    except:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                f.write(data)
             bot = Bot()
             answers = bot.answer(context_file_path, questions)
-            return Response(data=json.dumps(answers))
+            return Response(data=answers)
         return Response(status=status.HTTP_400_BAD_REQUEST)

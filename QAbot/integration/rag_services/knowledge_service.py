@@ -16,11 +16,11 @@ class KnowledgeBase:
     }
     
     def __init__(self, *args, **kwargs):
-        self.memory = connection.__getattr__('memory', None)
+        self.memory = getattr(connection, 'memory', None)
         if not self.memory:
             #  we persist the memory object in connection object
             self.memory = Memory()
-            connection.__setattr__('memory', self.memory)
+            setattr(connection, 'memory', self.memory)
 
     def add_document(self, path, type, *args, **kwargs):
         """
@@ -37,7 +37,7 @@ class KnowledgeBase:
         if type == FileTypes.JSON:
             if 'jq_schema' not in kwargs:
                 return
-            loader = JSONLoader(path, kwargs.get('jq_schema'))
+            loader = JSONLoader(path, kwargs.get('jq_schema'), text_content=False)
         else:
             loader = self.FILE_TYPE_TO_LOADER_MAP.get(type)(path)
 
