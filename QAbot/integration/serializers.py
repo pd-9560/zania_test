@@ -3,7 +3,7 @@ from rest_framework.serializers import Serializer, FileField, JSONField
 
 class UploadSerializer(Serializer):
     context = FileField()
-    questions = JSONField()
+    questions = FileField()
 
     class Meta:
         fields = ['context', 'questions', ]
